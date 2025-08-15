@@ -1,12 +1,13 @@
 .health-profile-container h3 {
   margin-top: 0;
-  color: #1abc9c;
-  border-bottom: 2px solid #3498db;
+  color: #3498db;
+  border-bottom: 2px solid #1abc9c;
   padding-bottom: 0.5rem;
   margin-bottom: 1.2rem;
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .profile-form {
