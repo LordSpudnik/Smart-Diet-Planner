@@ -58,6 +58,7 @@ cd ../frontend
 npm install
 npm start
 ```
+---
 
 ## 📝 Future Improvements & Next Steps
 
