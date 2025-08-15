@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./HealthProfile.css";
 
+// Helper to capitalize first letter of each word
+function capitalizeWords(str) {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 const HealthProfile = ({ profile, onProfileUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -38,7 +44,6 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
       },
     };
     try {
-      // POST is used for both create and update in your backend
       await axios.post("http://localhost:5000/api/profile", formData, config);
       if (typeof onProfileUpdate === "function") onProfileUpdate();
       setIsEditing(false);
@@ -139,11 +144,11 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
             </li>
             <li>
               <strong>Activity Level:</strong>{" "}
-              {formData.activityLevel.replace(/_/g, " ")}
+              {capitalizeWords(formData.activityLevel.replace(/_/g, " "))}
             </li>
             <li>
               <strong>Dietary Goals:</strong>{" "}
-              {formData.dietaryGoals.replace(/_/g, " ")}
+              {capitalizeWords(formData.dietaryGoals.replace(/_/g, " "))}
             </li>
           </ul>
           <button className="profile-edit" onClick={() => setIsEditing(true)}>

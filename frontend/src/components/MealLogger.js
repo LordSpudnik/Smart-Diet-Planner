@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./MealLogger.css";
 
+// Helper to capitalize first letter of each word
+function capitalizeWords(str) {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 const MealLogger = ({ meals, onMealLog }) => {
   const [mealType, setMealType] = useState("breakfast");
   const [foodName, setFoodName] = useState("");
@@ -17,7 +23,7 @@ const MealLogger = ({ meals, onMealLog }) => {
         "http://localhost:5000/api/meals",
         {
           mealType,
-          foodItems: [{ name: foodName, calories: Number(calories) }], // always send as array
+          foodItems: [{ name: foodName, calories: Number(calories) }],
         },
         config
       );
@@ -84,8 +90,8 @@ const MealLogger = ({ meals, onMealLog }) => {
           <ul>
             {todaysFoodItems.map((item, idx) => (
               <li key={idx}>
-                <strong>{item.mealType}:</strong> {item.name} ({item.calories}{" "}
-                kcal)
+                <strong>{capitalizeWords(item.mealType)}:</strong>{" "}
+                {capitalizeWords(item.name)} ({item.calories} kcal)
                 <span> {new Date(item.date).toLocaleTimeString()}</span>
               </li>
             ))}
