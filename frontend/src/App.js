@@ -26,7 +26,7 @@ function App() {
         return;
       }
       try {
-        const res = await axios.get("/api/profile/me", {
+        const res = await axios.get("/api/auth/user", {
           headers: { "x-auth-token": token },
         });
         setUsername(res.data.username);
