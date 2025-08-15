@@ -3,14 +3,15 @@ import axios from "axios";
 import "./HealthProfile.css";
 
 const HealthProfile = ({ profile, onProfileUpdate }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     age: "",
     weight: "",
     height: "",
-    activityLevel: "sedentary",
-    dietaryGoals: "maintenance",
+    activityLevel: "",
+    dietaryGoals: "",
   });
-  const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (profile) {
@@ -18,13 +19,9 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
         age: profile.age || "",
         weight: profile.weight || "",
         height: profile.height || "",
-        activityLevel: profile.activityLevel || "sedentary",
-        dietaryGoals: profile.dietaryGoals || "maintenance",
+        activityLevel: profile.activityLevel || "",
+        dietaryGoals: profile.dietaryGoals || "",
       });
-      setIsEditing(false);
-    } else {
-      // If there's no profile, immediately go into editing/creation mode.
-      setIsEditing(true);
     }
   }, [profile]);
 
@@ -33,18 +30,29 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     const config = {
       headers: {
         "Content-Type": "application/json",
-        "x-auth-token": localStorage.getItem("token"),
+        "x-auth-token": localStorage.getItem("authToken"),
       },
     };
     try {
+      // POST is used for both create and update in your backend
       await axios.post("http://localhost:5000/api/profile", formData, config);
-      onProfileUpdate(); // Refresh data on the dashboard
+      if (typeof onProfileUpdate === "function") onProfileUpdate();
       setIsEditing(false);
     } catch (err) {
-      console.error(err.response.data);
+      setError(
+        err.response?.data?.msg ||
+          err.response?.data ||
+          err.message ||
+          "Failed to save profile"
+      );
+      console.error(
+        "HealthProfile save error:",
+        err.response?.data || err.message
+      );
     }
   };
 
@@ -81,62 +89,67 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
             name="activityLevel"
             value={formData.activityLevel}
             onChange={onChange}
+            required
           >
-            <option value="sedentary">Sedentary (little or no exercise)</option>
-            <option value="light">
-              Lightly Active (light exercise/sports 1-3 days/week)
-            </option>
-            <option value="moderate">
-              Moderately Active (moderate exercise/sports 3-5 days/week)
-            </option>
-            <option value="active">
-              Very Active (hard exercise/sports 6-7 days a week)
-            </option>
-            <option value="very_active">
-              Extra Active (very hard exercise/physical job)
-            </option>
+            <option value="">Select activity level</option>
+            <option value="sedentary">Sedentary</option>
+            <option value="light">Light</option>
+            <option value="moderate">Moderate</option>
+            <option value="active">Active</option>
+            <option value="very_active">Very Active</option>
           </select>
           <select
             name="dietaryGoals"
             value={formData.dietaryGoals}
             onChange={onChange}
+            required
           >
+            <option value="">Select dietary goals</option>
             <option value="weight_loss">Weight Loss</option>
-            <option value="maintenance">Weight Maintenance</option>
             <option value="weight_gain">Weight Gain</option>
+            <option value="maintenance">Maintenance</option>
           </select>
-          <button type="submit">Save Profile</button>
-          {/* Only show Cancel button if a profile already exists to cancel from */}
-          {profile && (
-            <button type="button" onClick={() => setIsEditing(false)}>
-              Cancel
-            </button>
+          <button type="submit" className="profile-save">
+            Save
+          </button>
+          <button
+            type="button"
+            className="profile-cancel"
+            onClick={() => setIsEditing(false)}
+          >
+            Cancel
+          </button>
+          {error && (
+            <div className="profile-error" style={{ color: "red" }}>
+              {error}
+            </div>
           )}
         </form>
-      ) : // **THE FIX IS HERE**: We check if `profile` exists before trying to access its properties.
-      profile ? (
-        <div className="profile-view">
-          <p>
-            <strong>Age:</strong> {profile.age}
-          </p>
-          <p>
-            <strong>Weight:</strong> {profile.weight} kg
-          </p>
-          <p>
-            <strong>Height:</strong> {profile.height} cm
-          </p>
-          <p>
-            <strong>Activity Level:</strong>{" "}
-            {profile.activityLevel.replace(/_/g, " ")}
-          </p>
-          <p>
-            <strong>Goal:</strong> {profile.dietaryGoals.replace(/_/g, " ")}
-          </p>
-          <button onClick={() => setIsEditing(true)}>Edit Profile</button>
-        </div>
       ) : (
-        // This part is technically covered by the useEffect, but it's good practice for robustness.
-        <p>Loading profile or create one if you're new!</p>
+        <div className="profile-view">
+          <ul>
+            <li>
+              <strong>Age:</strong> {formData.age}
+            </li>
+            <li>
+              <strong>Weight:</strong> {formData.weight} kg
+            </li>
+            <li>
+              <strong>Height:</strong> {formData.height} cm
+            </li>
+            <li>
+              <strong>Activity Level:</strong>{" "}
+              {formData.activityLevel.replace(/_/g, " ")}
+            </li>
+            <li>
+              <strong>Dietary Goals:</strong>{" "}
+              {formData.dietaryGoals.replace(/_/g, " ")}
+            </li>
+          </ul>
+          <button className="profile-edit" onClick={() => setIsEditing(true)}>
+            Edit Profile
+          </button>
+        </div>
       )}
     </div>
   );
