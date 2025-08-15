@@ -1,106 +1,71 @@
-// This component renders the user login form.
-
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+const Login = ({ onLogin }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { email, password } = formData;
-
-  const onChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
+    setLoading(true);
     try {
-      // The URL must match your backend's login endpoint.
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData
-      );
-      localStorage.setItem("token", res.data.token); // Store the auth token
-      navigate("/dashboard"); // Redirect to the dashboard
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        onLogin(data.token);
+        navigate("/");
+      } else {
+        setError(data.msg || "Invalid credentials");
+      }
     } catch (err) {
-      console.error("Login Error:", err.response.data);
-      setError(err.response.data.msg || "An error occurred. Please try again.");
+      setError("Unable to login. Please try again.");
     }
+    setLoading(false);
   };
 
   return (
-    <div style={formContainerStyle}>
-      <h2>Login to Your Account</h2>
-      <form onSubmit={onSubmit} style={formStyle}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="form-container">
+      <h2>Login</h2>
+      <form className="form" onSubmit={handleSubmit}>
+        {error && <div className="form-error">{error}</div>}
         <input
+          className="form-input"
           type="email"
-          name="email"
           value={email}
-          onChange={onChange}
           placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
           required
-          style={inputStyle}
         />
         <input
+          className="form-input"
           type="password"
-          name="password"
           value={password}
-          onChange={onChange}
           placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
           required
-          style={inputStyle}
         />
-        <button type="submit" style={buttonStyle}>
-          Login
+        <button
+          className="form-button form-button-primary"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      <p style={{ textAlign: "center", marginTop: "1rem" }}>
-        Don't have an account? <Link to="/signup">Sign Up</Link>
-      </p>
+      <div className="form-text">
+        Don't have an account? <a href="/signup">Sign up</a>
+      </div>
     </div>
   );
-};
-
-// Reusing styles from Signup for consistency
-const formContainerStyle = {
-  maxWidth: "400px",
-  margin: "2rem auto",
-  padding: "2rem",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-  borderRadius: "8px",
-  backgroundColor: "#fff",
-};
-
-const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
-};
-
-const inputStyle = {
-  padding: "0.8rem",
-  border: "1px solid #ccc",
-  borderRadius: "4px",
-  fontSize: "1rem",
-};
-
-const buttonStyle = {
-  padding: "1rem",
-  border: "none",
-  borderRadius: "4px",
-  backgroundColor: "#007bff",
-  color: "white",
-  fontSize: "1rem",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
 };
 
 export default Login;

@@ -1,65 +1,73 @@
-// This is the main component that sets up the routing for your React application.
-// It determines which component to show based on the URL.
-
-import React from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import Dashboard from "./components/Dashboard";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import NavBar from "./components/NavBar";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import "./App.css"; // For global styles
+import Dashboard from "./components/Dashboard";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem("authToken");
+  });
+
+  useEffect(() => {
+    function checkAuth() {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    setIsLoggedIn(false);
+  };
+
+  const handleLoginOrSignup = (token) => {
+    localStorage.setItem("authToken", token);
+    setIsLoggedIn(true);
+  };
+
   return (
     <Router>
-      <div className="App">
-        <nav style={navStyle}>
-          <Link to="/" style={logoStyle}>
-            Smart Diet App
-          </Link>
-          <div>
-            <Link to="/login" style={linkStyle}>
-              Login
-            </Link>
-            <Link to="/signup" style={linkStyle}>
-              Sign Up
-            </Link>
-          </div>
-        </nav>
-        <main className="container">
-          <Routes>
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            {/* The root path will default to the Login page */}
-            <Route path="/" element={<Login />} />
-          </Routes>
-        </main>
-      </div>
+      <NavBar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <Routes>
+        <Route
+          path="/"
+          element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/login"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <Login onLogin={handleLoginOrSignup} />
+            )
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <Signup onSignup={handleLoginOrSignup} />
+            )
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
+        />
+      </Routes>
     </Router>
   );
 }
-
-// Basic styling for the navigation bar
-const navStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "1rem 2rem",
-  backgroundColor: "#333",
-  color: "white",
-};
-
-const logoStyle = {
-  color: "white",
-  textDecoration: "none",
-  fontSize: "1.5rem",
-  fontWeight: "bold",
-};
-
-const linkStyle = {
-  color: "white",
-  textDecoration: "none",
-  marginLeft: "1rem",
-};
 
 export default App;

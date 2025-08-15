@@ -1,117 +1,95 @@
-// This component renders the user registration form.
-
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Signup.css";
 
-const Signup = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+const Signup = ({ onSignup }) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { username, email, password } = formData;
-
-  const onChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-    try {
-      // The URL must match your backend's register endpoint.
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        formData
-      );
-      localStorage.setItem("token", res.data.token); // Store the auth token
-      navigate("/dashboard"); // Redirect to dashboard after successful signup
-    } catch (err) {
-      console.error("Signup Error:", err.response.data);
-      setError(err.response.data.msg || "An error occurred. Please try again.");
+    setError("");
+    if (password !== confirm) {
+      setError("Passwords do not match.");
+      return;
     }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        onSignup(data.token);
+        navigate("/");
+      } else {
+        setError(data.msg || "Signup failed.");
+      }
+    } catch (err) {
+      setError("Unable to sign up. Please try again.");
+    }
+    setLoading(false);
   };
 
   return (
-    <div style={formContainerStyle}>
-      <h2>Create Your Account</h2>
-      <form onSubmit={onSubmit} style={formStyle}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="form-container">
+      <h2>Sign Up</h2>
+      <form className="form" onSubmit={handleSubmit}>
+        {error && <div className="form-error">{error}</div>}
         <input
+          className="form-input"
           type="text"
-          name="username"
           value={username}
-          onChange={onChange}
           placeholder="Username"
+          onChange={(e) => setUsername(e.target.value)}
           required
-          style={inputStyle}
         />
         <input
+          className="form-input"
           type="email"
-          name="email"
           value={email}
-          onChange={onChange}
           placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
           required
-          style={inputStyle}
         />
         <input
+          className="form-input"
           type="password"
-          name="password"
           value={password}
-          onChange={onChange}
-          placeholder="Password (min 6 characters)"
+          placeholder="Password (min 6 chars)"
+          onChange={(e) => setPassword(e.target.value)}
           required
-          minLength="6"
-          style={inputStyle}
+          minLength={6}
         />
-        <button type="submit" style={buttonStyle}>
-          Sign Up
+        <input
+          className="form-input"
+          type="password"
+          value={confirm}
+          placeholder="Confirm Password"
+          onChange={(e) => setConfirm(e.target.value)}
+          required
+          minLength={6}
+        />
+        <button
+          className="form-button form-button-success"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
-      <p style={{ textAlign: "center", marginTop: "1rem" }}>
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
+      <div className="form-text">
+        Already have an account? <a href="/login">Login</a>
+      </div>
     </div>
   );
-};
-
-// Basic CSS-in-JS for styling
-const formContainerStyle = {
-  maxWidth: "400px",
-  margin: "2rem auto",
-  padding: "2rem",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-  borderRadius: "8px",
-  backgroundColor: "#fff",
-};
-
-const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
-};
-
-const inputStyle = {
-  padding: "0.8rem",
-  border: "1px solid #ccc",
-  borderRadius: "4px",
-  fontSize: "1rem",
-};
-
-const buttonStyle = {
-  padding: "1rem",
-  border: "none",
-  borderRadius: "4px",
-  backgroundColor: "#28a745",
-  color: "white",
-  fontSize: "1rem",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
 };
 
 export default Signup;
