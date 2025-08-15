@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import HealthProfile from "./HealthProfile";
 import MealLogger from "./MealLogger";
+import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
-const Dashboard = () => {
+const Dashboard = ({ onLogout }) => {
   const [profile, setProfile] = useState(null);
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -47,9 +49,12 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    // Remove both tokens (for safety, as your app might use either)
+    localStorage.removeItem("authToken");
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    if (onLogout) onLogout();
+    navigate("/login");
   };
 
   if (loading) {
@@ -64,7 +69,7 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Welcome to Your Dashboard</h1>
-        <button onClick={handleLogout} className="logout-button">
+        <button onClick={handleLogoutClick} className="logout-button">
           Logout
         </button>
       </div>
