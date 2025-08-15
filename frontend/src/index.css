@@ -26,10 +26,15 @@ code {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-  background: #f4f6fb;
+  width: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #d0e2ec;
-  border-radius: 6px;
+  background: linear-gradient(to bottom, #81b9ef, #3498eb);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #69a3da, #077dde);
 }

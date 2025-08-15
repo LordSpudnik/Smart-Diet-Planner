@@ -45,6 +45,12 @@
   border-bottom: 2px solid #23272f;
 }
 
+.nav-username {
+  margin-left: 2.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 .logout-button {
   padding: 0.6rem 1.3rem;
   margin-left: 2.2rem;
@@ -75,7 +81,8 @@
     gap: 0.8rem;
   }
   .nav-links a,
-  .logout-button {
+  .logout-button,
+  .nav-username {
     margin-left: 0.7rem;
     margin-right: 0.7rem;
     margin-top: 0.5rem;

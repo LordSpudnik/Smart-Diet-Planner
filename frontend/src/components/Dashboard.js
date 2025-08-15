@@ -13,7 +13,7 @@ const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const fetchData = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken"); // FIXED: always use "authToken"
     if (!token) {
       setLoading(false);
       return;
@@ -50,9 +50,7 @@ const Dashboard = ({ onLogout }) => {
   }, []);
 
   const handleLogoutClick = () => {
-    // Remove both tokens (for safety, as your app might use either)
     localStorage.removeItem("authToken");
-    localStorage.removeItem("token");
     if (onLogout) onLogout();
     navigate("/login");
   };

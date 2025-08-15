@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./NavBar.css";
 
-const NavBar = ({ isLoggedIn, onLogout }) => (
+const NavBar = ({ isLoggedIn, username, onLogout }) => (
   <nav className="nav-bar">
     <Link to="/" className="nav-logo">
       SmartDietPlanner
@@ -12,6 +12,11 @@ const NavBar = ({ isLoggedIn, onLogout }) => (
         <>
           <Link to="/login">Login</Link>
           <Link to="/signup">Signup</Link>
+        </>
+      )}
+      {isLoggedIn && (
+        <>
+          <span className="nav-username">{username}</span>
         </>
       )}
     </div>

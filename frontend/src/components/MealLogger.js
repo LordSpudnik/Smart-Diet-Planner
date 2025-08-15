@@ -9,23 +9,24 @@ const MealLogger = ({ meals, onMealLog }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const newMeal = {
-      mealType,
-      foodItems: [{ name: foodName, calories: Number(calories) }],
-    };
     const config = {
-      headers: {
-        "Content-Type": "application/json",
-        "x-auth-token": localStorage.getItem("token"),
-      },
+      headers: { "x-auth-token": localStorage.getItem("authToken") }, // FIXED: always use "authToken"
     };
     try {
-      await axios.post("http://localhost:5000/api/meals", newMeal, config);
-      onMealLog();
+      await axios.post(
+        "http://localhost:5000/api/meals",
+        {
+          mealType,
+          foodItems: [{ name: foodName, calories: Number(calories) }],
+        },
+        config
+      );
       setFoodName("");
       setCalories("");
+      setMealType("breakfast");
+      onMealLog();
     } catch (err) {
-      console.error(err.response.data);
+      console.error(err.response?.data || err.message);
     }
   };
 

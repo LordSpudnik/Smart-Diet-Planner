@@ -9,11 +9,34 @@ import NavBar from "./components/NavBar";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
+import axios from "axios";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return !!localStorage.getItem("authToken");
-  });
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => !!localStorage.getItem("authToken")
+  );
+  const [username, setUsername] = useState("");
+
+  // Fetch username from backend when logged in
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setUsername("");
+        return;
+      }
+      try {
+        const res = await axios.get("/api/profile/me", {
+          headers: { "x-auth-token": token },
+        });
+        setUsername(res.data.username);
+      } catch (err) {
+        setUsername("");
+      }
+    };
+    if (isLoggedIn) fetchProfile();
+    else setUsername("");
+  }, [isLoggedIn]);
 
   useEffect(() => {
     function checkAuth() {
@@ -26,16 +49,22 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     setIsLoggedIn(false);
+    setUsername("");
   };
 
   const handleLoginOrSignup = (token) => {
     localStorage.setItem("authToken", token);
     setIsLoggedIn(true);
+    // username will be fetched by useEffect after login
   };
 
   return (
     <Router>
-      <NavBar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <NavBar
+        isLoggedIn={isLoggedIn}
+        username={username}
+        onLogout={handleLogout}
+      />
       <Routes>
         <Route
           path="/"
