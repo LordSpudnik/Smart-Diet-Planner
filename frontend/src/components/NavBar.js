@@ -16,7 +16,7 @@ const NavBar = ({ isLoggedIn, username, onLogout }) => (
       )}
       {isLoggedIn && (
         <>
-          <span className="nav-username">{username}</span>
+          <span className="nav-username">Hello, {username}</span>
         </>
       )}
     </div>

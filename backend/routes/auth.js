@@ -5,6 +5,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs"); // A library for hashing passwords securely
 const jwt = require("jsonwebtoken"); // A library for creating JSON Web Tokens for authentication
 const User = require("../models/User"); // Import the User model to interact with the database
+const auth = require("../middleware/auth"); // Middleware to protect routes that require authentication
 
 // --- Registration Route (POST /api/auth/register) ---
 router.post("/register", async (req, res) => {
@@ -74,6 +75,16 @@ router.post("/login", async (req, res) => {
     );
   } catch (err) {
     console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+router.get("/user", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("username email");
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    res.json({ username: user.username, email: user.email });
+  } catch (err) {
     res.status(500).send("Server error");
   }
 });
