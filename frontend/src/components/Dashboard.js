@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import HealthProfile from "./HealthProfile";
 import MealLogger from "./MealLogger";
-import { useNavigate } from "react-router-dom";
+import Recommendations from "./Recommendations";
 import "./Dashboard.css";
 
-const Dashboard = ({ onLogout }) => {
+const Dashboard = () => {
   const [profile, setProfile] = useState(null);
   const [meals, setMeals] = useState([]);
+  const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const fetchData = async () => {
-    const token = localStorage.getItem("authToken"); // FIXED: always use "authToken"
+    const token = localStorage.getItem("token");
     if (!token) {
       setLoading(false);
       return;
@@ -23,22 +23,26 @@ const Dashboard = ({ onLogout }) => {
       headers: { "x-auth-token": token },
     };
 
-    try {
-      const profileRes = await axios.get(
-        "http://localhost:5000/api/profile/me",
-        config
-      );
-      setProfile(profileRes.data);
+    setError("");
+    setLoading(true);
 
-      const mealsRes = await axios.get(
-        "http://localhost:5000/api/meals",
-        config
-      );
+    try {
+      // Updated the API endpoint for recommendations
+      const [profileRes, mealsRes, recsRes] = await Promise.all([
+        axios.get("http://localhost:5000/api/profile/me", config),
+        axios.get("http://localhost:5000/api/meals", config),
+        axios.get("http://localhost:5000/api/ml_recommendations", config), // Calling the new ML endpoint
+      ]);
+
+      setProfile(profileRes.data);
       setMeals(mealsRes.data);
+      setRecommendations(recsRes.data);
     } catch (err) {
       console.error(err.response ? err.response.data : err.message);
-      if (err.response && err.response.status !== 400) {
-        setError("Failed to fetch data. Please try again later.");
+      if (err.response && err.response.data.msg) {
+        setError(err.response.data.msg);
+      } else {
+        setError("Failed to fetch all data. Please try again later.");
       }
     } finally {
       setLoading(false);
@@ -49,39 +53,31 @@ const Dashboard = ({ onLogout }) => {
     fetchData();
   }, []);
 
-  const handleLogoutClick = () => {
-    localStorage.removeItem("authToken");
-    if (onLogout) onLogout();
-    navigate("/login");
-  };
-
-  if (loading) {
-    return (
-      <div className="dashboard">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
-
   return (
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Welcome to Your Dashboard</h1>
-        <button onClick={handleLogoutClick} className="logout-button">
-          Logout
-        </button>
       </div>
 
       {error && <p className="dashboard-error">{error}</p>}
 
-      <div className="dashboard-content">
-        <div className="profile-section">
-          <HealthProfile profile={profile} onProfileUpdate={fetchData} />
-        </div>
-        <div className="meals-section">
-          <MealLogger meals={meals} onMealLog={fetchData} />
-        </div>
-      </div>
+      {loading ? (
+        <h2>Loading...</h2>
+      ) : (
+        <>
+          <div className="recommendations-section">
+            <Recommendations recommendations={recommendations} />
+          </div>
+          <div className="dashboard-content">
+            <div className="profile-section">
+              <HealthProfile profile={profile} onProfileUpdate={fetchData} />
+            </div>
+            <div className="meals-section">
+              <MealLogger meals={meals} onMealLog={fetchData} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
