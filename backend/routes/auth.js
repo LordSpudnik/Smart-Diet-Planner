@@ -5,7 +5,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs"); // A library for hashing passwords securely
 const jwt = require("jsonwebtoken"); // A library for creating JSON Web Tokens for authentication
 const User = require("../models/User"); // Import the User model to interact with the database
-const auth = require("../middleware/auth"); // Middleware to protect routes that require authentication
+const auth = require("../middleware/m_auth"); // Middleware to protect routes that require authentication
 
 // --- Registration Route (POST /api/auth/register) ---
 router.post("/register", async (req, res) => {
