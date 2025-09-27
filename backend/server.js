@@ -28,6 +28,7 @@ mongoose
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/meals", require("./routes/meals"));
+app.use("/api/ml_recommendations", require("./routes/ml_recommendations"));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);

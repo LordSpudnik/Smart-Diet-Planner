@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./MealLogger.css";
 
+// Helper to capitalize first letter of each word
+function capitalizeWords(str) {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 const MealLogger = ({ meals, onMealLog }) => {
   const [mealType, setMealType] = useState("breakfast");
   const [foodName, setFoodName] = useState("");
@@ -10,7 +16,7 @@ const MealLogger = ({ meals, onMealLog }) => {
   const onSubmit = async (e) => {
     e.preventDefault();
     const config = {
-      headers: { "x-auth-token": localStorage.getItem("authToken") }, // FIXED: always use "authToken"
+      headers: { "x-auth-token": localStorage.getItem("authToken") },
     };
     try {
       await axios.post(
@@ -29,6 +35,27 @@ const MealLogger = ({ meals, onMealLog }) => {
       console.error(err.response?.data || err.message);
     }
   };
+
+  // Helper: show today's meals for this user
+  const today = new Date();
+  const isSameDay = (d) =>
+    new Date(d).getFullYear() === today.getFullYear() &&
+    new Date(d).getMonth() === today.getMonth() &&
+    new Date(d).getDate() === today.getDate();
+
+  // Flatten all meal entries for today, mapping foodItems[index] to date[index]
+  const todaysFoodItems = [];
+  meals.forEach((meal) => {
+    meal.foodItems.forEach((item, idx) => {
+      if (meal.dates && meal.dates[idx] && isSameDay(meal.dates[idx])) {
+        todaysFoodItems.push({
+          mealType: meal.mealType,
+          ...item,
+          date: meal.dates[idx],
+        });
+      }
+    });
+  });
 
   return (
     <div className="meal-logger-container">
@@ -59,15 +86,13 @@ const MealLogger = ({ meals, onMealLog }) => {
 
       <div className="meals-list">
         <h4>Today's Meals</h4>
-        {meals.length > 0 ? (
+        {todaysFoodItems.length > 0 ? (
           <ul>
-            {meals.map((meal) => (
-              <li key={meal._id}>
-                <strong>{meal.mealType}:</strong>{" "}
-                {meal.foodItems
-                  .map((item) => `${item.name} (${item.calories} kcal)`)
-                  .join(", ")}
-                <span>{new Date(meal.date).toLocaleTimeString()}</span>
+            {todaysFoodItems.map((item, idx) => (
+              <li key={idx}>
+                <strong>{capitalizeWords(item.mealType)}:</strong>{" "}
+                {capitalizeWords(item.name)} ({item.calories} kcal)
+                <span> {new Date(item.date).toLocaleTimeString()}</span>
               </li>
             ))}
           </ul>

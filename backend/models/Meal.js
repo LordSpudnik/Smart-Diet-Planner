@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const FoodItemSchema = new Schema({
+  name: String,
+  calories: Number,
+});
+
 const MealSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
@@ -12,17 +17,8 @@ const MealSchema = new Schema({
     enum: ["breakfast", "lunch", "dinner", "snack"],
     required: true,
   },
-  foodItems: [
-    {
-      name: { type: String, required: true },
-      calories: { type: Number, required: true },
-      // You can add more nutritional info like protein, carbs, fats later
-    },
-  ],
-  date: {
-    type: Date,
-    default: Date.now,
-  },
+  foodItems: [FoodItemSchema], // array of food items
+  dates: [Date], // array of dates matching foodItems indices
 });
 
 module.exports = mongoose.model("Meal", MealSchema);
