@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
+const auth = require("../middleware/m_auth");
 const HealthProfile = require("../models/HealthProfile");
 
 // --- BMR and Calorie Calculation Logic ---

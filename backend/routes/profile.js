@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth"); // Import auth middleware
+const auth = require("../middleware/m_auth"); // Import auth middleware
 const HealthProfile = require("../models/HealthProfile");
 
 // @route   GET api/profile/me
