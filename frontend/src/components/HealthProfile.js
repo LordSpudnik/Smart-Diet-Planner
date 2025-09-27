@@ -9,6 +9,7 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
     height: "",
     activityLevel: "sedentary",
     dietaryGoals: "maintenance",
+    dietaryPreference: "non-veg", // --- ADD NEW STATE ---
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -20,10 +21,10 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
         height: profile.height || "",
         activityLevel: profile.activityLevel || "sedentary",
         dietaryGoals: profile.dietaryGoals || "maintenance",
+        dietaryPreference: profile.dietaryPreference || "non-veg", // --- UPDATE STATE FROM PROFILE ---
       });
       setIsEditing(false);
     } else {
-      // If there's no profile, immediately go into editing/creation mode.
       setIsEditing(true);
     }
   }, [profile]);
@@ -36,15 +37,20 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        "x-auth-token": localStorage.getItem("token"),
+        "x-auth-token": localStorage.getItem("authToken"),
       },
     };
     try {
-      await axios.post("http://localhost:5000/api/profile", formData, config);
-      onProfileUpdate(); // Refresh data on the dashboard
+      // The backend route is the same, we just send the updated formData
+      const res = await axios.post(
+        "http://localhost:5000/api/profile",
+        formData,
+        config
+      );
+      onProfileUpdate(res.data);
       setIsEditing(false);
     } catch (err) {
-      console.error(err.response.data);
+      console.error(err.response?.data || err.message);
     }
   };
 
@@ -82,19 +88,11 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
             value={formData.activityLevel}
             onChange={onChange}
           >
-            <option value="sedentary">Sedentary (little or no exercise)</option>
-            <option value="light">
-              Lightly Active (light exercise/sports 1-3 days/week)
-            </option>
-            <option value="moderate">
-              Moderately Active (moderate exercise/sports 3-5 days/week)
-            </option>
-            <option value="active">
-              Very Active (hard exercise/sports 6-7 days a week)
-            </option>
-            <option value="very_active">
-              Extra Active (very hard exercise/physical job)
-            </option>
+            <option value="sedentary">Sedentary</option>
+            <option value="light">Light Activity</option>
+            <option value="moderate">Moderate Activity</option>
+            <option value="active">Active</option>
+            <option value="very_active">Very Active</option>
           </select>
           <select
             name="dietaryGoals"
@@ -102,19 +100,28 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
             onChange={onChange}
           >
             <option value="weight_loss">Weight Loss</option>
-            <option value="maintenance">Weight Maintenance</option>
+            <option value="maintenance">Maintenance</option>
             <option value="weight_gain">Weight Gain</option>
           </select>
+
+          {/* --- NEW DROPDOWN FOR DIETARY PREFERENCE --- */}
+          <select
+            name="dietaryPreference"
+            value={formData.dietaryPreference}
+            onChange={onChange}
+          >
+            <option value="non-veg">Non-Vegetarian</option>
+            <option value="veg">Vegetarian</option>
+          </select>
+
           <button type="submit">Save Profile</button>
-          {/* Only show Cancel button if a profile already exists to cancel from */}
           {profile && (
             <button type="button" onClick={() => setIsEditing(false)}>
               Cancel
             </button>
           )}
         </form>
-      ) : // **THE FIX IS HERE**: We check if `profile` exists before trying to access its properties.
-      profile ? (
+      ) : profile ? (
         <div className="profile-view">
           <p>
             <strong>Age:</strong> {profile.age}
@@ -132,11 +139,17 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
           <p>
             <strong>Goal:</strong> {profile.dietaryGoals.replace(/_/g, " ")}
           </p>
+          {/* --- DISPLAY THE NEW PREFERENCE --- */}
+          <p>
+            <strong>Diet:</strong>{" "}
+            {profile.dietaryPreference === "veg"
+              ? "Vegetarian"
+              : "Non-Vegetarian"}
+          </p>
           <button onClick={() => setIsEditing(true)}>Edit Profile</button>
         </div>
       ) : (
-        // This part is technically covered by the useEffect, but it's good practice for robustness.
-        <p>Loading profile or create one if you're new!</p>
+        <p>Create your profile to get started!</p>
       )}
     </div>
   );
