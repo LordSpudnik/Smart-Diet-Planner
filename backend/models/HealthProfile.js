@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const HealthProfileSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: "User", // Links this profile to a specific user
+    ref: "User",
     required: true,
     unique: true,
   },
@@ -13,12 +13,10 @@ const HealthProfileSchema = new Schema({
     required: true,
   },
   weight: {
-    // in kilograms
     type: Number,
     required: true,
   },
   height: {
-    // in centimeters
     type: Number,
     required: true,
   },
@@ -30,6 +28,13 @@ const HealthProfileSchema = new Schema({
   dietaryGoals: {
     type: String,
     enum: ["weight_loss", "weight_gain", "maintenance"],
+    required: true,
+  },
+  // --- NEW FIELD ---
+  dietaryPreference: {
+    type: String,
+    enum: ["veg", "non-veg"],
+    default: "non-veg", // Default to non-veg if not provided
     required: true,
   },
   updatedAt: {

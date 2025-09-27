@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/m_auth"); // Import auth middleware
+const auth = require("../middleware/m_auth");
 const HealthProfile = require("../models/HealthProfile");
 
 // @route   GET api/profile/me
@@ -26,7 +26,15 @@ router.get("/me", auth, async (req, res) => {
 // @desc    Create or update user health profile
 // @access  Private
 router.post("/", auth, async (req, res) => {
-  const { age, weight, height, activityLevel, dietaryGoals } = req.body;
+  // --- DESTRUCTURE THE NEW FIELD FROM req.body ---
+  const {
+    age,
+    weight,
+    height,
+    activityLevel,
+    dietaryGoals,
+    dietaryPreference,
+  } = req.body;
 
   const profileFields = {
     user: req.user.id,
@@ -35,6 +43,7 @@ router.post("/", auth, async (req, res) => {
     height,
     activityLevel,
     dietaryGoals,
+    dietaryPreference, // --- ADD IT TO THE PROFILE OBJECT ---
     updatedAt: Date.now(),
   };
 
