@@ -41,7 +41,6 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
       },
     };
     try {
-      // The backend route is the same, we just send the updated formData
       const res = await axios.post(
         "http://localhost:5000/api/profile",
         formData,
