@@ -1,17 +1,18 @@
-# Smart Diet Planner
+# 🚀 Smart Diet Planner
 
-Smart Diet Planner is a full-stack web application that helps users log their meals, track calories, manage their health profile, and set dietary goals. Built for students and health-conscious individuals, it provides an intuitive interface for daily nutrition tracking and goal management.
+Smart Diet Planner helps you log meals, track calories, maintain a health profile, and get personalized recommendations for a healthier lifestyle.
 
 ---
 
-## 🚀 Features
+## ✨ What's New
 
-- **User Authentication:** Sign up, log in, and securely manage your account.
-- **Meal Logging:** Add, edit, and view meals for different times of day (Breakfast, Lunch, Dinner, Snacks).
-- **Calorie Tracking:** Automatically sums up calories for meals and daily intake.
-- **Health Profile:** Maintain your age, height, weight, activity level, and dietary goals.
-- **Personalized Dashboard:** See your logged data and progress at a glance.
-- **Responsive Design:** Works on desktop and mobile devices.
+- **Machine Learning Recommendations:** Get AI-powered personalized meal and health recommendations.
+- **Improved Authentication:** More robust login/signup and JWT user sessions.
+- **Health Profile Editing:** Better UI/UX and extended fields.
+- **Meal Logging Enhancements:** Faster logging, multi-food entries, and improved daily summaries.
+- **Dashboard Overhaul:** Real-time updates, error feedback, and cleaner layout.
+- **Mobile Optimization:** Enhanced responsiveness and touch support.
+- **Bug Fixes:** Improved error handling and more reliable API connections.
 
 ---
 
@@ -19,21 +20,28 @@ Smart Diet Planner is a full-stack web application that helps users log their me
 
 - **Frontend:** React, CSS
 - **Backend:** Node.js, Express
+- **Machine Learning:** Python (recommendation engine)
 - **Database:** MongoDB (with Mongoose)
 - **Authentication:** JWT
 - **Deployment:** Netlify (frontend), Render (backend), MongoDB Atlas (database)
 
 ---
 
-## 🖥️ Local Setup
+## 🚦 Features
 
-### Prerequisites
+- **User Authentication:** Secure signup, login, and account management.
+- **Meal Logging:** Add, edit, and view meals for any time of day.
+- **Calorie Tracking:** Automatic calorie totals and daily breakdowns.
+- **Health Profile:** Track age, weight, height, activity level, and goals.
+- **Personalized Dashboard:** See progress, recent meals, profile, and recommendations.
+- **AI Recommendations:** Get smarter suggestions for diet and health.
+- **Mobile-Friendly Design:** Works smoothly on desktop and mobile.
 
-- Node.js (v16+ recommended)
-- npm or yarn
-- MongoDB Atlas account
+---
 
-### 1. Clone the repository
+## 📦 Getting Started
+
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/LordSpudnik/Smart-Diet-Planner.git
@@ -45,9 +53,7 @@ cd Smart-Diet-Planner
 ```bash
 cd backend
 npm install
-# Create a .env file with the following variables:
-# MONGO_URI=your_mongodb_connection_string
-# JWT_SECRET=your_jwt_secret
+# Copy .env.example to .env and set your MongoDB URI and secrets
 npm start
 ```
 
@@ -58,16 +64,18 @@ cd ../frontend
 npm install
 npm start
 ```
+
+### 4. Run Machine Learning Service (if using recommendations)
+
+```bash
+cd ../ml_service
+pip install -r requirements.txt
+python app.py
+```
+
 ---
 
-## 📝 Future Improvements & Next Steps
+## 🔒 Environment Variables
 
-- **Next Steps:**
-  - Implement Python-based ML engine.
-  - Collect nutritional datasets (from Kaggle or USDA).
-  - Develop personalized meal suggestion logic.
-
-- **Optional Features:**
-  - Integration with fitness wearables (e.g., steps data).
-  - Daily motivational tips for healthy living.
-  - Option to generate grocery lists based on meal plans.
+- Set your MongoDB URI and JWT secret in `backend/.env`
+- Configure frontend API endpoint in `frontend/.env` if needed.
