@@ -17,6 +17,9 @@ const NavBar = ({ isLoggedIn, username, onLogout }) => (
       {isLoggedIn && (
         <>
           <span className="nav-username">Hello, {username}</span>
+          <button onClick={onLogout} className="logout-button">
+            Logout
+          </button>
         </>
       )}
     </div>
