@@ -2,6 +2,24 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./MealLogger.css";
 
+// Helper: capitalize first letter of string (robust to null/undefined)
+function capitalizeFirstLetter(str) {
+  if (str === null || str === undefined) return "";
+  const s = String(str).trim();
+  if (s.length === 0) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Helper: Title-case a phrase (capitalize every word)
+function titleCase(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .trim()
+    .split(/\s+/)
+    .map((w) => capitalizeFirstLetter(w.toLowerCase()))
+    .join(" ");
+}
+
 const MealLogger = ({ meals, onMealLog }) => {
   const [mealType, setMealType] = useState("breakfast");
   const [foodName, setFoodName] = useState("");
@@ -63,9 +81,17 @@ const MealLogger = ({ meals, onMealLog }) => {
           <ul>
             {meals.map((meal) => (
               <li key={meal._id}>
-                <strong>{meal.mealType}:</strong>{" "}
+                <strong>
+                  {capitalizeFirstLetter(
+                    // replace underscores or hyphens with spaces for nicer display
+                    String(meal.mealType || "").replace(/[_-]+/g, " ")
+                  )}
+                  :
+                </strong>{" "}
                 {meal.foodItems
-                  .map((item) => `${item.name} (${item.calories} kcal)`)
+                  .map(
+                    (item) => `${titleCase(item.name)} (${item.calories} kcal)`
+                  )
                   .join(", ")}
                 <span>{new Date(meal.date).toLocaleTimeString()}</span>
               </li>

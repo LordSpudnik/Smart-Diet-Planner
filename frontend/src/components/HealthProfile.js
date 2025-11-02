@@ -3,10 +3,10 @@ import axios from "axios";
 import "./HealthProfile.css";
 
 function capitalizeFirstLetter(str) {
-  if (str.length === 0) {
-    return "";
-  }
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  if (str === null || str === undefined) return "";
+  const s = String(str);
+  if (s.length === 0) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 const HealthProfile = ({ profile, onProfileUpdate }) => {
@@ -16,22 +16,20 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
     height: "",
     activityLevel: "sedentary",
     dietaryGoals: "maintenance",
-    dietaryPreference: "non-veg", // --- ADD NEW STATE ---
+    dietaryPreference: "non-veg",
   });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (profile) {
+      // Do NOT transform values for form inputs (keeps types and select values consistent).
       setFormData({
-        age: capitalizeFirstLetter(profile.age) || "",
-        weight: capitalizeFirstLetter(profile.weight) || "",
-        height: capitalizeFirstLetter(profile.height) || "",
-        activityLevel:
-          capitalizeFirstLetter(profile.activityLevel) || "sedentary",
-        dietaryGoals:
-          capitalizeFirstLetter(profile.dietaryGoals) || "maintenance",
-        dietaryPreference:
-          capitalizeFirstLetter(profile.dietaryPreference) || "non-veg", // --- UPDATE STATE FROM PROFILE ---
+        age: profile.age ?? "",
+        weight: profile.weight ?? "",
+        height: profile.height ?? "",
+        activityLevel: profile.activityLevel || "sedentary",
+        dietaryGoals: profile.dietaryGoals || "maintenance",
+        dietaryPreference: profile.dietaryPreference || "non-veg",
       });
       setIsEditing(false);
     } else {
@@ -114,7 +112,6 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
             <option value="weight_gain">Weight Gain</option>
           </select>
 
-          {/* --- NEW DROPDOWN FOR DIETARY PREFERENCE --- */}
           <select
             name="dietaryPreference"
             value={formData.dietaryPreference}
@@ -144,12 +141,16 @@ const HealthProfile = ({ profile, onProfileUpdate }) => {
           </p>
           <p>
             <strong>Activity Level:</strong>{" "}
-            {profile.activityLevel.replace(/_/g, " ")}
+            {profile.activityLevel
+              ? capitalizeFirstLetter(profile.activityLevel.replace(/_/g, " "))
+              : ""}
           </p>
           <p>
-            <strong>Goal:</strong> {profile.dietaryGoals.replace(/_/g, " ")}
+            <strong>Goal:</strong>{" "}
+            {profile.dietaryGoals
+              ? capitalizeFirstLetter(profile.dietaryGoals.replace(/_/g, " "))
+              : ""}
           </p>
-          {/* --- DISPLAY THE NEW PREFERENCE --- */}
           <p>
             <strong>Diet:</strong>{" "}
             {profile.dietaryPreference === "veg"
