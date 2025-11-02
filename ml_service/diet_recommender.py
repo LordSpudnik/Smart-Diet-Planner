@@ -2,9 +2,7 @@ import pandas as pd
 import numpy as np
 
 def calculate_tdee(age, weight_kg, height_cm, activity_level, goal):
-    """
-    Calculates the Total Daily Energy Expenditure (TDEE) for a user.
-    """
+    # Calculates the Total Daily Energy Expenditure (TDEE) for a user.
     bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
     activity_multipliers = {
         "sedentary": 1.2, "light": 1.375, "moderate": 1.55,
@@ -16,9 +14,7 @@ def calculate_tdee(age, weight_kg, height_cm, activity_level, goal):
     return tdee
 
 def filter_whole_foods(df):
-    """
-    Filters the DataFrame to exclude processed and composite foods.
-    """
+    # Filters the DataFrame to exclude processed and composite foods.
     blocklist = [
         'spread', 'sauce', 'dressing', 'powder', 'canned', 'juice',
         'syrup', 'cereal', 'bar', 'chips', 'cookie', 'cracker', 'infant',
@@ -30,9 +26,7 @@ def filter_whole_foods(df):
     return filtered_df
 
 def filter_dietary_preference(df, preference):
-    """
-    Filters the DataFrame based on veg or non-veg preference.
-    """
+    # Filters the DataFrame based on veg or non-veg preference.
     if preference.lower() == 'veg':
         # Keywords to identify non-vegetarian food
         non_veg_keywords = [
@@ -49,9 +43,7 @@ def filter_dietary_preference(df, preference):
 
 
 def recommend_diet(tdee, dietary_preference="non-veg", dataset_path="nutrition.csv"):
-    """
-    Generates a daily diet plan based on TDEE and dietary preference.
-    """
+    # Generates a daily diet plan based on TDEE and dietary preference.
     try:
         df = pd.read_csv(dataset_path)
     except FileNotFoundError:
