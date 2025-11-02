@@ -18,7 +18,7 @@ def filter_whole_foods(df):
     blocklist = [
         'spread', 'sauce', 'dressing', 'powder', 'canned', 'juice',
         'syrup', 'cereal', 'bar', 'chips', 'cookie', 'cracker', 'infant',
-        'formula', 'toddler', 'beverage', 'shake', 'soup', 'cnd', 'usda'
+        'formula', 'toddler', 'beverage', 'shake', 'soup', 'cnd', 'usda', 'flour'
     ]
     mask = df['Food'].str.contains('|'.join(blocklist), case=False, na=False)
     filtered_df = df[~mask]
@@ -32,7 +32,10 @@ def filter_dietary_preference(df, preference):
         non_veg_keywords = [
             'beef', 'pork', 'lamb', 'chicken', 'turkey', 'fish', 'salmon',
             'tuna', 'shrimp', 'crab', 'lobster', 'bacon', 'sausage', 'ham',
-            'meat', 'poultry', 'seafood', 'veal', 'mutton'
+            'meat', 'poultry', 'seafood', 'veal', 'mutton', 'duck', 'goat',
+            'gelatin', 'anchovy', 'sardine', 'trout', 'cod', 'clam', 'oyster',
+            'scallop', 'octopus', 'squid', 'venison', 'rabbit', 'brisket', 
+            'ribeye', 'sirloin', 'prosciutto', 'steak', 'emu', 'pigeon', 'turtle'
         ]
         mask = df['Food'].str.contains('|'.join(non_veg_keywords), case=False, na=False)
         filtered_df = df[~mask]
