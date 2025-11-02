@@ -118,7 +118,7 @@ if __name__ == "__main__":
         "dietary_preference": "veg"
     }
 
-    print("Generating diet plan for user profile:")
+    print("Generating diet plan for the user profile:")
     print(user_profile)
 
     user_tdee = calculate_tdee(
