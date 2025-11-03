@@ -24,28 +24,10 @@ def calculate_tdee(age, weight_kg, height_cm, activity_level, goal):
 
 def filter_whole_foods(df):
     blocklist = [
-        "spread",
-        "sauce",
-        "dressing",
-        "powder",
-        "canned",
-        "juice",
-        "syrup",
-        "cereal",
-        "bar",
-        "chips",
-        "cookie",
-        "cracker",
-        "infant",
-        "formula",
-        "toddler",
-        "beverage",
-        "shake",
-        "soup",
-        "cnd",
-        "usda",
-        "flour",
-        "raw",
+        "spread", "sauce", "dressing", "powder", "canned", "juice",
+        "syrup", "cereal", "bar", "chips", "cookie", "cracker", "infant",
+        "formula", "toddler", "beverage", "shake", "soup", "cnd", "usda",
+        "flour", "raw"
     ]
     mask = df["Food"].str.contains("|".join(blocklist), case=False, na=False)
     return df[~mask]
@@ -54,47 +36,12 @@ def filter_whole_foods(df):
 def filter_dietary_preference(df, preference):
     if preference.lower() == "veg":
         non_veg_keywords = [
-            "beef",
-            "pork",
-            "lamb",
-            "chicken",
-            "turkey",
-            "fish",
-            "salmon",
-            "tuna",
-            "shrimp",
-            "crab",
-            "lobster",
-            "bacon",
-            "sausage",
-            "ham",
-            "meat",
-            "poultry",
-            "seafood",
-            "veal",
-            "mutton",
-            "duck",
-            "goat",
-            "gelatin",
-            "anchovy",
-            "sardine",
-            "trout",
-            "cod",
-            "clam",
-            "oyster",
-            "scallop",
-            "octopus",
-            "squid",
-            "venison",
-            "rabbit",
-            "brisket",
-            "ribeye",
-            "sirloin",
-            "prosciutto",
-            "steak",
-            "emu",
-            "pigeon",
-            "turtle",
+            "beef", "pork", "lamb", "chicken", "turkey", "fish", "salmon",
+            "tuna", "shrimp", "crab", "lobster", "bacon", "sausage", "ham",
+            "meat", "poultry", "seafood", "veal", "mutton", "duck", "goat",
+            "gelatin", "anchovy", "sardine", "trout", "cod", "clam", "oyster",
+            "scallop", "octopus", "squid", "venison", "rabbit", "brisket",
+            "ribeye", "sirloin", "prosciutto", "steak", "emu", "pigeon", "turtle"
         ]
         mask = df["Food"].str.contains("|".join(non_veg_keywords), case=False, na=False)
         return df[~mask]
@@ -102,37 +49,23 @@ def filter_dietary_preference(df, preference):
 
 
 def resolve_dataset_path(dataset_path):
-    """
-    Ensures the nutrition.csv path resolves correctly regardless of how Python is launched.
-    """
-    # 1️⃣ if an absolute path exists, use it
-    if os.path.isabs(dataset_path) and os.path.exists(dataset_path):
-        return dataset_path
-
-    # 2️⃣ check relative to script directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    path_in_script_dir = os.path.join(script_dir, dataset_path)
-    if os.path.exists(path_in_script_dir):
-        return path_in_script_dir
-
-    # 3️⃣ check inside a 'data' folder
-    path_in_data_dir = os.path.join(script_dir, "data", dataset_path)
-    if os.path.exists(path_in_data_dir):
-        return path_in_data_dir
-
-    # 4️⃣ fallback: current working directory
-    cwd_path = os.path.join(os.getcwd(), dataset_path)
-    if os.path.exists(cwd_path):
-        return cwd_path
-
-    # None found
+    paths = [
+        dataset_path,
+        os.path.join(script_dir, dataset_path),
+        os.path.join(script_dir, "data", dataset_path),
+        os.path.join(os.getcwd(), dataset_path),
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            return p
     return None
 
 
 def recommend_diet_from_profile(profile, dataset_path="nutrition.csv"):
     dataset_resolved = resolve_dataset_path(dataset_path)
     if not dataset_resolved or not os.path.exists(dataset_resolved):
-        return None, f"Nutrition dataset not found. Please place 'nutrition.csv' in the same folder as diet_recommender.py or inside a 'data/' folder."
+        return None, "Nutrition dataset not found. Please place 'nutrition.csv' beside diet_recommender.py."
 
     age = int(profile.get("age", 25))
     weight = float(profile.get("weight", profile.get("weight_kg", 70)))
@@ -142,10 +75,9 @@ def recommend_diet_from_profile(profile, dataset_path="nutrition.csv"):
     dietary_pref = profile.get("dietaryPreference", "non-veg")
 
     tdee = calculate_tdee(age, weight, height, activity_level, goal)
-
     df = pd.read_csv(dataset_resolved)
 
-    # ✅ Flexible column mapping
+    # --- Flexible column mapping ---
     lower_cols = [c.lower().strip() for c in df.columns]
 
     def find_col(possible):
@@ -161,25 +93,15 @@ def recommend_diet_from_profile(profile, dataset_path="nutrition.csv"):
     fat_col = find_col(["fat", "fats", "lipids"])
 
     if not all([food_col, cal_col, protein_col, carbs_col, fat_col]):
-        missing = [
-            n
-            for n, c in zip(
-                ["Food", "Calories", "Protein", "Carbs", "Fat"],
-                [food_col, cal_col, protein_col, carbs_col, fat_col],
-            )
-            if c is None
-        ]
-        return None, f"CSV missing required columns: {', '.join(missing)}"
+        return None, "CSV missing required columns."
 
-    df = df[[food_col, cal_col, protein_col, carbs_col, fat_col]].rename(
-        columns={
-            food_col: "Food",
-            cal_col: "Calories",
-            protein_col: "Protein",
-            carbs_col: "Carbs",
-            fat_col: "Fat",
-        }
-    )
+    df = df[[food_col, cal_col, protein_col, carbs_col, fat_col]].rename(columns={
+        food_col: "Food",
+        cal_col: "Calories",
+        protein_col: "Protein",
+        carbs_col: "Carbs",
+        fat_col: "Fat",
+    })
 
     for c in ["Calories", "Protein", "Carbs", "Fat"]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
@@ -192,8 +114,8 @@ def recommend_diet_from_profile(profile, dataset_path="nutrition.csv"):
     meal_targets = {
         "Breakfast": tdee * 0.25,
         "Lunch": tdee * 0.35,
-        "Dinner": tdee * 0.30,
         "Snack": tdee * 0.10,
+        "Dinner": tdee * 0.30,
     }
 
     plan = []
@@ -206,16 +128,14 @@ def recommend_diet_from_profile(profile, dataset_path="nutrition.csv"):
         else:
             chosen = possible.sample(1).iloc[0]
 
-        plan.append(
-            {
-                "Meal": meal,
-                "Food": str(chosen["Food"]).title(),
-                "Calories": round(float(chosen["Calories"]), 2),
-                "Protein (g)": round(float(chosen["Protein"]), 2),
-                "Carbs (g)": round(float(chosen["Carbs"]), 2),
-                "Fat (g)": round(float(chosen["Fat"]), 2),
-            }
-        )
+        plan.append({
+            "Meal": meal,
+            "Food": str(chosen["Food"]).title(),
+            "Calories": round(float(chosen["Calories"]), 2),
+            "Protein (g)": round(float(chosen["Protein"]), 2),
+            "Carbs (g)": round(float(chosen["Carbs"]), 2),
+            "Fat (g)": round(float(chosen["Fat"]), 2),
+        })
 
     plan_df = pd.DataFrame(plan)
     summary = {
@@ -228,6 +148,11 @@ def recommend_diet_from_profile(profile, dataset_path="nutrition.csv"):
     }
     plan_df = pd.concat([plan_df, pd.DataFrame([summary])], ignore_index=True)
 
+    # ✅ enforce display order
+    meal_order = ["Breakfast", "Lunch", "Snack", "Dinner", "Total"]
+    plan_df["Meal"] = pd.Categorical(plan_df["Meal"], categories=meal_order, ordered=True)
+    plan_df = plan_df.sort_values("Meal").reset_index(drop=True)
+
     csv_name = "diet_plan.csv"
     plan_df.to_csv(csv_name, index=False)
 
@@ -238,7 +163,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--stdin", action="store_true")
     parser.add_argument("--dataset", type=str, default=os.path.join(os.path.dirname(__file__), "nutrition.csv"))
-
     args = parser.parse_args()
 
     try:
@@ -246,12 +170,9 @@ def main():
             profile = json.loads(sys.stdin.read())
         else:
             profile = {
-                "age": 25,
-                "weight": 70,
-                "height": 175,
-                "activityLevel": "moderate",
-                "dietaryGoals": "maintenance",
-                "dietaryPreference": "veg",
+                "age": 25, "weight": 70, "height": 175,
+                "activityLevel": "moderate", "dietaryGoals": "maintenance",
+                "dietaryPreference": "veg"
             }
 
         plan, meta = recommend_diet_from_profile(profile, args.dataset)

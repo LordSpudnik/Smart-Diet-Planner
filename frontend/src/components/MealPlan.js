@@ -25,7 +25,11 @@ const MealPlan = () => {
         { headers: { "x-auth-token": token } }
       );
       if (res.data && res.data.plan) {
-        setPlan(res.data.plan);
+        const mealOrder = ["Breakfast", "Lunch", "Snack", "Dinner", "Total"];
+        const sorted = [...res.data.plan].sort(
+          (a, b) => mealOrder.indexOf(a.Meal) - mealOrder.indexOf(b.Meal)
+        );
+        setPlan(sorted);
       } else {
         setError("Received unexpected response from server.");
       }
