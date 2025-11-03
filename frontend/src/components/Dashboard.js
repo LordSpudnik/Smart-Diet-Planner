@@ -1,7 +1,9 @@
+// Dashboard.js (modified to include MealPlan)
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import HealthProfile from "./HealthProfile";
 import MealLogger from "./MealLogger";
+import MealPlan from "./MealPlan";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
@@ -13,7 +15,7 @@ const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const fetchData = async () => {
-    const token = localStorage.getItem("authToken"); // FIXED: always use "authToken"
+    const token = localStorage.getItem("authToken");
     if (!token) {
       setLoading(false);
       return;
@@ -24,16 +26,10 @@ const Dashboard = ({ onLogout }) => {
     };
 
     try {
-      const profileRes = await axios.get(
-        "http://localhost:5000/api/profile/me",
-        config
-      );
+      const profileRes = await axios.get("/api/profile/me", config);
       setProfile(profileRes.data);
 
-      const mealsRes = await axios.get(
-        "http://localhost:5000/api/meals",
-        config
-      );
+      const mealsRes = await axios.get("/api/meals", config);
       setMeals(mealsRes.data);
     } catch (err) {
       console.error(err.response ? err.response.data : err.message);
@@ -47,6 +43,9 @@ const Dashboard = ({ onLogout }) => {
 
   useEffect(() => {
     fetchData();
+    // listen for profile update via local storage (optional)
+    window.addEventListener("storage", fetchData);
+    return () => window.removeEventListener("storage", fetchData);
   }, []);
 
   const handleLogoutClick = () => {
@@ -78,8 +77,17 @@ const Dashboard = ({ onLogout }) => {
         <div className="profile-section">
           <HealthProfile profile={profile} onProfileUpdate={fetchData} />
         </div>
+
         <div className="meals-section">
           <MealLogger meals={meals} onMealLog={fetchData} />
+          <hr
+            style={{
+              margin: "1.2rem 0",
+              border: "0",
+              borderTop: "1px solid #eef6fb",
+            }}
+          />
+          <MealPlan />
         </div>
       </div>
     </div>

@@ -1,34 +1,33 @@
-// This is the main entry point for your backend application.
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
+const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
-// --- Middleware ---
-app.use(cors()); // Enables Cross-Origin Resource Sharing to allow frontend and backend to communicate
-app.use(express.json()); // Parses incoming JSON requests so we can use req.body
-
-const mongoURI = process.env.MONGO_URI;
+app.use(cors());
+app.use(express.json());
 
 mongoose
-  .connect(mongoURI, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("MongoDB connected successfully."))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB error:", err));
 
-// --- API Routes ---
-// We define the main routes for our application here.
-// All routes starting with /api/auth will be handled by the auth.js file.
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/meals", require("./routes/meals"));
+app.use("/api/diet", require("./routes/diet")); // ✅ added
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
-});
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+  app.get("*", (_, res) =>
+    res.sendFile(path.join(__dirname, "client/build", "index.html"))
+  );
+}
+
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
