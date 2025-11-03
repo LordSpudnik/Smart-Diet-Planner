@@ -42,14 +42,20 @@
   box-shadow: 0 4px 16px rgba(231, 76, 60, 0.1);
 }
 
+/* Layout: two-column top (profile + meals) and a full-width planner row below */
 .dashboard-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "profile meals"
+    "planner planner";
   gap: 2.5rem;
 }
 
-.profile-section,
-.meals-section {
+/* Assign sections to named grid areas */
+.profile-section {
+  grid-area: profile;
   background-color: #f8fafc;
   padding: 2rem 1.5rem 1.5rem 1.5rem;
   border-radius: 12px;
@@ -57,6 +63,26 @@
   min-width: 0;
 }
 
+.meals-section {
+  grid-area: meals;
+  background-color: #f8fafc;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.05);
+  min-width: 0;
+}
+
+/* New planner section styled as its own card and spans full width */
+.planner-section {
+  grid-area: planner;
+  background-color: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(52, 152, 219, 0.03);
+  min-width: 0;
+}
+
+/* Keep dashboard error styling */
 .dashboard-error {
   color: #dc3545;
   text-align: center;
@@ -67,10 +93,14 @@
   margin-top: 1rem;
 }
 
-/* Responsive */
+/* Responsive: stack into single column on smaller screens */
 @media (max-width: 1000px) {
   .dashboard-content {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "profile"
+      "meals"
+      "planner";
     gap: 1.5rem;
   }
 }

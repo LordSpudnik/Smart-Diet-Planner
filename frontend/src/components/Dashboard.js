@@ -1,4 +1,3 @@
-// Dashboard.js (modified to include MealPlan)
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import HealthProfile from "./HealthProfile";
@@ -80,13 +79,9 @@ const Dashboard = ({ onLogout }) => {
 
         <div className="meals-section">
           <MealLogger meals={meals} onMealLog={fetchData} />
-          <hr
-            style={{
-              margin: "1.2rem 0",
-              border: "0",
-              borderTop: "1px solid #eef6fb",
-            }}
-          />
+        </div>
+
+        <div className="planner-section">
           <MealPlan />
         </div>
       </div>
