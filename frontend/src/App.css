@@ -1,4 +1,3 @@
-/* Global App Styles */
 .App {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f4f6fb;
@@ -6,7 +5,6 @@
   color: #23272f;
 }
 
-/* Navigation Bar Styles */
 .nav-bar {
   display: flex;
   justify-content: space-between;
@@ -48,7 +46,6 @@
   border-bottom: 2px solid #23272f;
 }
 
-/* Form Container for Login and Signup */
 .form-container {
   max-width: 440px;
   margin: 3.5rem auto;
@@ -66,7 +63,6 @@
   font-weight: 700;
 }
 
-/* Form Element Styles */
 .form {
   display: flex;
   flex-direction: column;
@@ -130,7 +126,6 @@
   font-size: 0.97rem;
 }
 
-/* Dashboard Styles */
 .dashboard {
   max-width: 900px;
   margin: 2.5rem auto 2rem auto;
@@ -161,7 +156,6 @@
   box-shadow: 0 4px 16px rgba(231, 76, 60, 0.1);
 }
 
-/* Responsive */
 @media (max-width: 700px) {
   .dashboard {
     max-width: 98vw;

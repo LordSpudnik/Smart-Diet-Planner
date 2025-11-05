@@ -17,7 +17,6 @@ function App() {
   );
   const [username, setUsername] = useState("");
 
-  // Fetch username from backend when logged in
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("authToken");
@@ -55,7 +54,6 @@ function App() {
   const handleLoginOrSignup = (token) => {
     localStorage.setItem("authToken", token);
     setIsLoggedIn(true);
-    // username will be fetched by useEffect after login
   };
 
   return (

@@ -21,7 +21,7 @@ mongoose
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/meals", require("./routes/meals"));
-app.use("/api/diet", require("./routes/diet")); // ✅ added
+app.use("/api/diet", require("./routes/diet"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "client/build")));
